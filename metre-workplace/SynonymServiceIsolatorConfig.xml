@@ -1,0 +1,13 @@
+<mimicConfig>
+  <basename>SynonymService</basename>
+  <mechanism>functional</mechanism>
+  <classMatch>
+    <classPattern>org.overworld.example.webservice.engine.SeekTask</classPattern>
+    <methodMatch>
+      <methodPattern>getSynonyms</methodPattern>
+      <regex>false</regex>
+      <signatureMatches>.*</signatureMatches>
+    </methodMatch>
+    <regex>false</regex>
+  </classMatch>
+ </mimicConfig>

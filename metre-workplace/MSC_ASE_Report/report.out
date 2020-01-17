@@ -1,0 +1,37 @@
+\BOOKMARK [0][-]{chapter*.1}{Abstract}{}% 1
+\BOOKMARK [0][-]{toc.0}{Table of Contents}{}% 2
+\BOOKMARK [0][-]{figures.0}{Figures}{}% 3
+\BOOKMARK [0][-]{listings.0}{Listings}{}% 4
+\BOOKMARK [0][-]{chapter.1}{Introduction }{}% 5
+\BOOKMARK [0][-]{chapter.2}{Related Work }{}% 6
+\BOOKMARK [0][-]{chapter.3}{System Description }{}% 7
+\BOOKMARK [1][-]{section.3.1}{Application Replay }{chapter.3}% 8
+\BOOKMARK [1][-]{section.3.2}{Existing Bytecode Manipulation Frameworks}{chapter.3}% 9
+\BOOKMARK [2][-]{subsection.3.2.1}{Application Configuration }{section.3.2}% 10
+\BOOKMARK [2][-]{subsection.3.2.2}{Record and Replay Modes}{section.3.2}% 11
+\BOOKMARK [2][-]{subsection.3.2.3}{Method Call Nesting}{section.3.2}% 12
+\BOOKMARK [2][-]{subsection.3.2.4}{Thread Identification }{section.3.2}% 13
+\BOOKMARK [2][-]{subsection.3.2.5}{Mechanisms of Application Replay }{section.3.2}% 14
+\BOOKMARK [2][-]{subsection.3.2.6}{Challenges to Instrumentation with ASM}{section.3.2}% 15
+\BOOKMARK [1][-]{section.3.3}{Performance Measurement}{chapter.3}% 16
+\BOOKMARK [2][-]{subsection.3.3.1}{Metrics Collection}{section.3.3}% 17
+\BOOKMARK [2][-]{subsection.3.3.2}{Application of Load }{section.3.3}% 18
+\BOOKMARK [2][-]{subsection.3.3.3}{Target Execution}{section.3.3}% 19
+\BOOKMARK [2][-]{subsection.3.3.4}{Specifying the JVM Parameter Search Space}{section.3.3}% 20
+\BOOKMARK [2][-]{subsection.3.3.5}{Special Examination of Garbage Collectior Parameters }{section.3.3}% 21
+\BOOKMARK [2][-]{subsection.3.3.6}{Static and Dynamic Parameters}{section.3.3}% 22
+\BOOKMARK [2][-]{subsection.3.3.7}{Configuration Structure}{section.3.3}% 23
+\BOOKMARK [2][-]{subsection.3.3.8}{Score Cards }{section.3.3}% 24
+\BOOKMARK [2][-]{subsection.3.3.9}{Visualisation of Time Series Data }{section.3.3}% 25
+\BOOKMARK [2][-]{subsection.3.3.10}{Challenges to Measurement}{section.3.3}% 26
+\BOOKMARK [0][-]{chapter.4}{Experimental Design }{}% 27
+\BOOKMARK [1][-]{section.4.1}{Synonym Service }{chapter.4}% 28
+\BOOKMARK [1][-]{section.4.2}{JMeter Load Test Script}{chapter.4}% 29
+\BOOKMARK [1][-]{section.4.3}{Description of the Test Environment}{chapter.4}% 30
+\BOOKMARK [0][-]{chapter.5}{Results and Analysis }{}% 31
+\BOOKMARK [0][-]{chapter.6}{Conclusions }{}% 32
+\BOOKMARK [0][-]{chapter*.37}{Appendix A: Metre Configuration File}{}% 33
+\BOOKMARK [0][-]{chapter*.38}{Appendix B: Mimic Configuration File for Synonym Service}{}% 34
+\BOOKMARK [0][-]{chapter*.39}{Appendix C: Example Gnuplot Output File}{}% 35
+\BOOKMARK [0][-]{chapter*.40}{Appendix D: Application Replay Experiments}{}% 36
+\BOOKMARK [0][-]{chapter*.44}{Appendix E: Additional Graphs of the Performance Experiment}{}% 37

@@ -1,0 +1,43 @@
+\contentsline {chapter}{Abstract}{1}{chapter*.1}
+\contentsline {chapter}{\numberline {1}Introduction }{5}{chapter.1}
+\contentsline {chapter}{\numberline {2}Related Work }{9}{chapter.2}
+\contentsline {chapter}{\numberline {3}System Description }{12}{chapter.3}
+\contentsline {section}{\numberline {3.1}Application Replay }{12}{section.3.1}
+\contentsline {section}{\numberline {3.2}Existing Bytecode Manipulation Frameworks}{12}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Application Configuration }{14}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Record and Replay Modes}{15}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Method Call Nesting}{15}{subsection.3.2.3}
+\contentsline {subsection}{\numberline {3.2.4}Thread Identification }{16}{subsection.3.2.4}
+\contentsline {subsection}{\numberline {3.2.5}Mechanisms of Application Replay }{16}{subsection.3.2.5}
+\contentsline {subsection}{\numberline {3.2.6}Challenges to Instrumentation with ASM}{17}{subsection.3.2.6}
+\contentsline {subsubsection}{Virtual Machine Errors}{17}{section*.11}
+\contentsline {subsubsection}{Circular Methods Calls Resulting from Instrumentation}{18}{section*.12}
+\contentsline {subsubsection}{Incorrect Reference Handling in Bytecode}{20}{section*.13}
+\contentsline {subsubsection}{Instrumented Method Invocations to Classes in Lower ClassLoaders }{22}{section*.16}
+\contentsline {section}{\numberline {3.3}Performance Measurement}{23}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Metrics Collection}{24}{subsection.3.3.1}
+\contentsline {subsubsection}{Flight Recorder}{24}{section*.17}
+\contentsline {subsubsection}{Performance Summary JVM Parameters}{24}{section*.18}
+\contentsline {subsubsection}{JConsole and JMX}{25}{section*.19}
+\contentsline {subsection}{\numberline {3.3.2}Application of Load }{25}{subsection.3.3.2}
+\contentsline {subsubsection}{Log File Parsing}{26}{section*.20}
+\contentsline {subsection}{\numberline {3.3.3}Target Execution}{26}{subsection.3.3.3}
+\contentsline {subsection}{\numberline {3.3.4}Specifying the JVM Parameter Search Space}{26}{subsection.3.3.4}
+\contentsline {subsection}{\numberline {3.3.5}Special Examination of Garbage Collectior Parameters }{27}{subsection.3.3.5}
+\contentsline {subsection}{\numberline {3.3.6}Static and Dynamic Parameters}{28}{subsection.3.3.6}
+\contentsline {subsection}{\numberline {3.3.7}Configuration Structure}{28}{subsection.3.3.7}
+\contentsline {subsection}{\numberline {3.3.8}Score Cards }{29}{subsection.3.3.8}
+\contentsline {subsection}{\numberline {3.3.9}Visualisation of Time Series Data }{29}{subsection.3.3.9}
+\contentsline {subsection}{\numberline {3.3.10}Challenges to Measurement}{30}{subsection.3.3.10}
+\contentsline {subsubsection}{The Attach API}{30}{section*.22}
+\contentsline {chapter}{\numberline {4}Experimental Design }{31}{chapter.4}
+\contentsline {section}{\numberline {4.1}Synonym Service }{31}{section.4.1}
+\contentsline {section}{\numberline {4.2}JMeter Load Test Script}{32}{section.4.2}
+\contentsline {section}{\numberline {4.3}Description of the Test Environment}{33}{section.4.3}
+\contentsline {chapter}{\numberline {5}Results and Analysis }{36}{chapter.5}
+\contentsline {chapter}{\numberline {6}Conclusions }{40}{chapter.6}
+\contentsline {chapter}{Appendix A: Metre Configuration File}{43}{chapter*.37}
+\contentsline {chapter}{Appendix B: Mimic Configuration File for Synonym Service}{47}{chapter*.38}
+\contentsline {chapter}{Appendix C: Example Gnuplot Output File}{48}{chapter*.39}
+\contentsline {chapter}{Appendix D: Application Replay Experiments}{49}{chapter*.40}
+\contentsline {chapter}{Appendix E: Additional Graphs of the Performance Experiment}{52}{chapter*.44}

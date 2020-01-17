@@ -1,0 +1,39 @@
+# Metre run number 38 with runtime 76.0 s, cpu time 74590137000 ns and score 131.58
+
+unset xtics
+set yrange [0:*]
+
+set style line 1 linecolor rgb '#FF0000' linetype 1 linewidth 2 pointtype 7 pointsize 1
+set style line 2 linecolor rgb '#00FF00' linetype 1 linewidth 2 pointtype 7 pointsize 1
+
+set multiplot layout 2,1 rowsfirst title "Run 38 with runtime 76.0 s, cpu time 74590137000 ns and score 131.58\n \
+-XX:+UseConcMarkSweepGC -XX:-UseParNewGC -XX:-CMSScavengeBeforeRemark -XX:CMSTriggerRatio=70 -XX:ConcGCThreads=8 \n\
+-XX:+UseAdaptiveSizePolicy -XX:-UseStringDeduplication -XX:+AggressiveOpts\n\
+GC Copy 2354 times taking 5808 ms; ConcurrentMarkSweep 1 times taking 27 ms"
+
+set ylabel "bytes"
+
+plot "-" title "Heap Memory Usage" with lines, "-" title "Non-Heap Memory Usage" with lines
+1 41472184
+2 42031848
+...
+106 31827816
+107 31906744
+e
+1 46257224
+2 46340200
+...
+106 51005648
+107 51009976
+e
+
+unset title
+set ylabel "load"
+
+plot "-" title "CpuLoad" with lines 
+1 .0000
+2 .2676
+...
+106 .0019
+107 .0017
+e

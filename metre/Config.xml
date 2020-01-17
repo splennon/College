@@ -1,0 +1,200 @@
+<configRoot>
+ 
+  <!-- dynamically tuned parameters that apply to all GCs or are not GC-specific -->
+
+  <dynamics>
+
+    <boolParameter>
+      <!-- Adaptively size generations -->
+      <name>UseAdaptiveSizePolicy</name>
+      <description>Adaptive sizing of generations</description>
+      <startingValue>false</startingValue>
+    </boolParameter>
+
+    <boolParameter>
+      <!-- Use string deduplication on the heap -->
+      <name>UseStringDeduplication</name>
+      <description>Deduplication of strings on the heap</description>
+      <startingValue>false</startingValue>
+    </boolParameter>
+
+    <boolParameter>
+      <!-- Use AggressiveOpts which currently sets higher AutoBoxCacheMax BiasedLockingStartupDelay -->
+      <name>AggressiveOpts</name>
+      <description>Aggressively choose options for AutoBoxCacheMax BiasedLockingStartupDelay</description>
+      <startingValue>false</startingValue>
+    </boolParameter>
+
+    <integralStepParameter>
+      <!-- Minimum Heap Free Ratio  % from 10 to 55 in units of 15 -->
+      <name>MinHeapFreeRatio</name>
+      <description>The minimim allowed free heap after GC below which heap grows</description>
+      <increment>15</increment>
+      <maxValue>55</maxValue>
+      <value>10</value>
+    </integralStepParameter>
+
+  </dynamics>
+
+  <!-- Static parameters represent combinations that activate specific GC behaviour with specialised dynamic parameters therein -->
+
+  <statics>
+
+    <!-- Young Copy and Old ConcurrentMarkSweep -->
+
+    <staticParameters>
+      <description>Young Copy and Old ConcurrentMarkSweep</description>
+      <dynamics>
+
+        <boolParameter>
+          <name>CMSScavengeBeforeRemark</name>
+          <description>Scavenge before the Remark Step</description>
+          <startingValue>false</startingValue>
+        </boolParameter>
+
+        <integralStepParameter>
+          <!-- Percentage of the minimum free that, when used, triggers a CMS collection, 70, 80 or 90 % -->
+          <name>CMSTriggerRatio</name>
+          <description>Percentage of Minimum Free Used to invoke CMS</description>
+          <increment>10</increment>
+          <maxValue>90</maxValue>
+          <value>70</value>
+        </integralStepParameter>
+        
+        <stringListParameter>
+          <!-- The number of GC threads: 4 or 8 -->
+          <name>ConcGCThreads</name>
+          <description>Number of threads for Concurrent GC</description>
+          <values>
+            <string>4</string>
+            <string>8</string>
+          </values>
+        </stringListParameter>
+
+      </dynamics>
+      <parameters>-XX:+UseConcMarkSweepGC -XX:-UseParNewGC</parameters>
+    </staticParameters>
+
+    <!-- Young Copy and Old MarkSweepCompact -->
+
+    <staticParameters>
+      <description>Young Copy and Old MarkSweepCompact</description>
+      <dynamics/>
+      <parameters>-XX:+UseSerialGC</parameters>
+    </staticParameters>
+
+    <!-- Young G1 and Old G1 -->
+
+    <staticParameters>
+      <description>Young G1 and Old G1</description>
+      <dynamics>
+
+        <integralStepParameter>
+          <!-- Heap occupancy at which to start GC, 30 to 90 % in increments of 20 % -->
+          <name>InitiatingHeapOccupancyPercent</name>
+          <description>Heap occupancy at which to start GC</description>
+          <increment>20</increment>
+          <maxValue>90</maxValue>
+          <value>30</value>
+        </integralStepParameter>
+
+      </dynamics>
+      <parameters>-XX:+UseG1GC</parameters>
+    </staticParameters>
+
+    <!-- Young ParNew and Old ConcurrentMarkSweep -->
+
+    <staticParameters>
+      <description>Young ParNew and Old ConcurrentMarkSweep</description>
+      <dynamics>
+
+        <boolParameter>
+          <name>CMSScavengeBeforeRemark</name>
+          <description>Scavenge before the Remark Step</description>
+          <startingValue>false</startingValue>
+        </boolParameter>
+
+        <integralStepParameter>
+          <!-- Percentage of the minimum free that, when used, triggers a CMS collection, 70, 80 or 90 % -->
+          <name>CMSTriggerRatio</name>
+          <description>Percentage of Minimum Free Used to invoke CMS</description>
+          <increment>10</increment>
+          <maxValue>90</maxValue>
+          <value>70</value>
+        </integralStepParameter>
+        
+        <stringListParameter>
+          <!-- The number of GC threads: 4 or 8 -->
+          <name>ConcGCThreads</name>
+          <description>Number of threads for Concurrent GC</description>
+          <values>
+            <string>4</string>
+            <string>8</string>
+          </values>
+        </stringListParameter>
+
+      </dynamics>
+      <parameters>-XX:+UseConcMarkSweepGC</parameters>
+    </staticParameters>
+
+    <!-- Young ParNew and Old MarkSweepCompact -->
+
+    <staticParameters>
+      <description>Young ParNew and Old MarkSweepCompact</description>
+      <dynamics/>
+      <parameters>-XX:+UseParNewGC</parameters>
+    </staticParameters>
+
+    <!-- Young PS Scavenge and Old PS MarkSweep -->
+
+    <staticParameters>
+      <description>Young PS Scavenge and Old PS MarkSweep</description>
+      <dynamics>
+
+        <stringListParameter>
+          <!-- The number of GC threads: 4 or 8 -->
+          <name>ParallelGCThreads</name>
+          <description>Number of threads for Paraleel GC</description>
+          <values>
+            <string>4</string>
+            <string>8</string>
+          </values>
+        </stringListParameter>
+
+        <boolParameter>
+          <!-- Use AggressiveHeap option to automatically select heap options -->
+          <name>AggressiveHeap</name>
+          <description>Aggressively choose heap sizing</description>
+          <startingValue>false</startingValue>
+        </boolParameter>
+
+      </dynamics>
+      <parameters>-XX:+UseParallelGC -XX:+UseParallelOldGC</parameters>
+    </staticParameters>
+
+  </statics>
+
+  <!-- End of GC Selection -->
+
+  <!-- Options for starting the target process -->
+
+  <targetOptions>
+    <arguments></arguments>
+    <invocation>./syno.jar</invocation>
+    <java>/Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home/bin/java</java>
+    <jvmParams>-Dcom.sun.management.jmxremote.port=9690 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false</jvmParams>
+    <jmxPort>9690</jmxPort>
+  </targetOptions>
+
+  <!-- Options for starting JMeter -->
+
+  <jmeterOptions>
+    <initialHeap>50</initialHeap>
+    <java>/Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home/bin/java</java>
+    <logFile>./jmeter.log</logFile>
+    <maxHeap>2048</maxHeap>
+    <mainJar>./jmeter/bin/ApacheJmeter.jar</mainJar>
+    <testFile>jmeter.jmx</testFile>
+  </jmeterOptions>
+
+</configRoot>

@@ -1,0 +1,33 @@
+@book{humble:2010,
+  title={Continuous Delivery: Reliable Software Releases through Build, Test, and Deployment Automation (Adobe Reader)},
+  author={Humble, Jez and Farley, David},
+  year={2010},
+  publisher={Pearson Education}
+}
+@article{feitelson:2013,
+  title={Development and deployment at Facebook},
+  author={Feitelson, Dror G and Frachtenberg, Eitan and Beck, Kent L},
+  journal={IEEE Internet Computing},
+  number={4},
+  pages={8--17},
+  year={2013},
+  publisher={IEEE}
+}
+@inproceedings{jenkins:2011,
+  title={Velocity Culture},
+  author={Jenkins, Jon},
+  booktitle={O’Reilly Velocity Conference. http://blip. tv/oreilly-velocity-conference/velocity-2011-jon-jenkins-velocity-culture-5297293, letzter Zugriff},
+  volume={23},
+  pages={2012},
+  year={2011}
+}
+@book{papazoglou:2008,
+  title={Web services: principles and technology},
+  author={Papazoglou, Michael},
+  year={2008},
+  publisher={Pearson Education}
+}
+
+
+
+

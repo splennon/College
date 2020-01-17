@@ -1,0 +1,394 @@
+\documentclass[]{final_report}
+
+\def\studentname{Stephen Lennon}
+\def\projecttitle{Application Replay for Performance Evaluation and Tuning}
+\def\supervisorname{Dr. Liam Murphy}
+
+\begin{document}
+
+\maketitle
+
+%% Abstract %%
+\begin{abstract}
+
+\textbf{\textsl{This document is a layout and formatting template for your ASE project. It's there to help you, but change it as much as your want!}}
+
+What is an abstract? The abstract should provide a short overview of your project that enables a reader to decide if your report is of interest to them or not. It should be concise, to-the-point and interesting. Avoid making it read like a verbose table of contents. Avoid references, jargon or acronyms, as the reader may not be familiar with them. An abstract usually contains a brief description of:
+
+\begin{itemize}
+\item The project and its context;
+\item How the project work was carried out;
+\item The major findings or results.
+\end{itemize}
+
+One paragraph is plenty. The main thing to remember is the principle that the abstract must be short, and a person reading it should be able to determine if they want to read more. For example, if your project involves building a compiler for Java, and a major section of your work is focussed on developing an efficient parser (rather than say code-generation), make this clear in the abstract. Then a reader who is interested in efficient parsing techniques knows that your report may be of interest to them.
+
+\end{abstract}
+\newpage
+
+\clearpage
+\pdfbookmark{Table of Contents}{toc}\tableofcontents
+\newpage
+
+%% Introduction %%
+
+\chapter{\label{introduction} Introduction}
+In the last decade the core activities of the Software Developer have changed somewhat. Whereas popular opinion might hold that the Software Developer spends hours each day engrossed in implementing algorithms, designing Application Programmer Interfaces, or otherwise writing volumes of code, the reality of Software has always included the practice of building and deploying the resulting code artefacts. Traditionally a person in the role of Build Engineer is responsible for ensuring that code produced by Developers builds correctly, thus forming artefacts, and a Systems Administrator is responsible for ensuring that those built artefacts are transported to suitable computing hardware where they have the requisite resources and configuration to perform their intended function.
+While the names of the roles and division of responsibilities may vary, the involvement of the Software Developer traditionally did not extend far beyond the build process, and perhaps consultation with those tasked to build and deploy the software. Such traditional notions of responsibility in the Software Development Lifecycle have been significantly eroded in the last ten years or so. In their 2010 book “Continuous Delivery: Reliable Software Releases Through Build, Test, and Deployment Automation”, Humble and Farley \cite{humble:2010} identify three activities which they refer to as ``Release Antipatterns": ``Deploying Software Manually", ``Deploying to a Production-Like Environment only after Development is Complete", and ``Manual Configuration Management of Production Environments".
+To understand a little about why manual software deployment is undesirable it may help to look at one of the many large corporations that has moved away from such practices out of the necessity of scale. In their 2013 paper “Development and Deployment at Facebook”, Feitelson, Frachtenberg and Beck \cite{feitelson:2013} describe a software development environment where employees are encouraged to release customer-facing software to the Facebook website \footnote{http://www.facebook.com} during an initial 6-week induction training course, and thereafter make multiple commits per day or week, which over about 1000 developers at the time of writing, result in a deployment to the Facebook website every day. Perhaps a more impressive and well published statistic from 2011 \cite{jenkins:2011}, puts deployments to Production Amazon Systems at an average of 1 every 11.6 seconds on weekdays over the month of May 2011.
+
+Clearly these organisations would have difficulty benefiting from a release cycle that waits until all development is complete and then requires a manual deployment. Accordingly it is no stretch to imagine that the traditional role of Build Engineer and Deployment Engineer must morph somewhat to accommodate Continuous Deployment at this scale and speed. To effect this evolution, the field of DevOps has emerged, (The name being a portmanteau  of Development and Operations), summarised by Wettinger, Breitenbiücher et al.(year) as “An emerging paradigm to tightly integrate developers with operations personnel,” noting too that “This is required to enable fast and frequent releases in the sense of continuously delivering software.” It is now common to find DevOps Engineers in companies of all sizes with skills that combine Development, Scripting, Quality Assurance, UNIX and other Operating System Skills that were traditionally separate roles.
+
+Consider the popular EC2 cloud offering from the Americal Amazon.com. EC2 is a web-based service that allows users to commission virtualised computers referred to as Instances or EC2 Instances to run Microsoft Windows or multiple distributions of Linux. The service is accessed using a web interface or programmatically via a REST API or one of a number of software libraries built atop that API and is considered an example of an IaaS (Infrastructure as a service) cloud offering \cite{papazoglou:2008}.  While EC2 is surrounded by a suite of cooperating web services for Databases, Messaging Services, Development, Management, Auditing, Security, Automation etc. and while these other services might more accurately be considered Platform as a Service or Software as a Service offerings, EC2 is typically considered Infrastructure as a Service as it provides an operating system instance upon which the user’s application can then be deployed.
+
+Papazoglu \cite{papazoglou:2008} cites Elasticity as an ``Essential characteristic of Cloud Computing" in that more instances can be added automatically to meet the load and performance requirements of the application. This brings us to an important point: Applications in EC2 typically run over multiple EC2 instances if they are to scale up without stopping the application. While it is possible to change the underlying virtual machine, increasing or decreasing the number of virtual CPUs, amount of memory and network performance, the EC2 instance must be rebooted to achieve this, thus causing an outage if there is only one instance. For this and other reasons applications that are designed to run in the cloud typically are spread over multiple instances that can be added or removed depending on the load on the application. With this technology landscape in mind, it is now easy to see the import of Humble and Farley’s third Release Antipattern: “Manual Configuration Management of Production Environments”.
+
+The topic of this project, however, is narrower in scope than that of all configuration. Specifically this project is concerned with the configuration of the platform on which the application runs. Further it focuses on the Java Virtual Machine as the component that requires configuration. The JVM is chosen because it is an excellent example of a cohesive software infrastructural component that has a rich set of configuration options and many combinations of same. Performance related JVM options are still a mystery to many developers, being considered in some quarters more an art than science. Further the JVM can be restarted many times in quick succession whereas other components, such as the Operating System cannot be so easily installed into a test harness and restarted, prodded and poked to perform the same task repeatedly.
+
+As described earlier, frequent releases are a reality of the software development lifecycle in the cloud environment and so code changes occur in all areas of the application that are under development or active maintenance all the time, and there is no longer a point in time at which the task of ``Perform JVM Performance Tuning" can be scheduled. If a particular set of instances is tasked with running an application and the code undergoes change in a Continuous Delivery environment, there is no specific date or release timeline to frame that change, and it may or may not affect the performance of the JVM running the code. It may be that the JVM parameters could be better tuned today even if they were perfect a week ago. Add to this the complexity that, in the web services environment, the performance of upstream systems with which the code communicates can change also, and the varying content or cadence of the upstream systems may affect the performance of the system under scrutiny.
+
+Consider also that a JVM that is badly tuned for the application it is running will make the instance less effective, perhaps degrading its performance on grounds of timeliness. A reduced responsiveness may result in an increased response time, or a reduced throughput. [Smith, Connie U., and Lloyd G. Williams. "Performance solutions: a practical guide to creating responsive, scalable software." (2001). Page 4] In the case of reduced throughput, assuming scalability of the application, more instances will be required to run the application than if it were better performing. In a well managed automatically scaling application, this will result in increased costs as the additional instances come with an additional cost and there may be no immediate indication that the application could subsist on fewer. In the latter case, where response time is increased, the situation is possibly a little more grim, as if the response time refers to an action upon which the user is waiting, and it is not parallelisable, then adding more instance may not compensate. Tuning the JVM to a better performing set of parameters addresses both scenarios.
+
+The objective of this project is to examine potential ways to automate exploration of JVM parameters upon a specific and repeatable execution path which is temporarily isolated from upstream dependencies in an effort to locate combinations of JVM parameters that provide preferable performance characteristics.
+
+The approach taken herein is based on repeatability of the execution path, treating it somewhat as a black box. This is based largely on a technique of input replay where the inputs from the upstream system are recorded and replayed by intervening in the invocation and parameter passing of nominated methods in the application at a bytecode level using a bytecode engineering library, a technique which is more thoroughly explained later in this report. Importantly though, the application is left unmodified as much as possible beyond the record and replay of input so that normal processes internal to the JVM, such as thread scheduling, heap sizing and resource allocation are unimpeded and thus these processes may differ between runs. Without such latitude a performance measurement would be dubious as the application under measurement would be forced into an artificial pattern of behaviour likely affecting performance. These activities are performed by the included project code artefact named Mimic.
+
+An examination of the available JVM parameters was conducted, and a sample set of parameters was determined to form the basis of experimentation. A range of values was chosen for each such parameter: true or false for boolean parameters; an incrementing range of integers or a list of strings. As part of the project the Garbage Collector related parameters were scrutinised to limit the number of sensible combinations, thereby making automated testing more efficient. All remaining parameters are combined in all combinations and a target process is executed using each combination. This experimental execution is performed by the included project artefact named Metre.
+
+In each experimental run of the target application, key performance metrics are extracted from the target JVM using the MBeans server built in to the Sun HotSpot JVM. For the duration of the application run, these key performance metrics are collected in time series and they then form the basis of a heuristic evaluation of the performance of the JVM during the experimental run with each parameter set. The metrics are also used to produce graphs of the top performing parameter combinations. This metrics gathering and interpretation is also performed by the included project artefact named Metre.
+
+In order to obtain experimental results using the Mimic and Metre artefacts, it is necessary to have an application to profile. Because the purpose of the project is to automate parameter selection in a cloud environment, where manual selection is infeasible, it is desirable to use a Java application that is representative of a simple web service such as would run in a multi-node cloud environment. The included project artefact named synonym-service is a simple web service built using Spring Boot. It exposes a REST interface through which the user may start jobs, monitor progress, and collect the results of the job run. The purpose of the job run is to construct differing bodies of text that produce the same message digest by substituting synonyms of words in the original text to produce a new target text. The exact purpose of the sample application is described in more detail later, though it is not important to the experiment, it is simply an indicative application that has a dependency on an upstream service that provides synonyms of words on request, and resembles a real world web service while being unencumbered by copyright.
+
+%% Related Work %%
+\chapter{\label{related_work} Related Work}
+Bytecode Replay is itself not a new idea, and a number of prior works apply this technique to the task of making the execution flow of a multithreaded program deterministic to facilitate debugging, or to automatically locate concurrency bugs in a multithreaded application. Machado, Lucia and Rodrigues (2015) propose the most recent application of this technique found in the preparation of this document. The techniques applied are a form of bytecode modification to produce thread execution schedules which are then used to locate the cause of concurrency bugs. While the techniques are relevant, it is not the intention of this project to make multithreaded execution deterministic.
+
+Schuppan, Baur and Biere (2005) describe the format of a thread schedule that can achieve deterministic replay, but merely mention that the schedule could accommodate a record of the input to the program.
+
+Steven, Chandra, Fleck and Podgurski (2000) provide the prior work with the greatest overlap with the objectives of this project in that they have defined and implemented a capture scheme based on substituting parts of the Java standard library with alternate implementations. Much of their work is focused on achieving execution traces from GUI applications and so their scheme is focused on capturing the schedule of events representing a user’s journey through a Graphical User Interface oriented application. The scheme they design is unsuitable for console applications because it changes the runtime of IO intensive applications by up to an observed 10 times. Further it does not deal with network IO.
+
+The jRapture scheme described by Steven et al. (2000) also predates support for java agents and provides modified Java library implementations instead of leveraging the bytecode manipulation frameworks previously mentioned. It is expected that the application of bytecode manipulation could provide more efficient and targeted interception of IO whereas Java agents would allow plug-in integration with production software.
+
+Orso and Kennedy (2005) describe a scheme of Selective Capture that proposes to address the volume of information required to capture in order to replay execution of a program, though the objective of their efforts is again for the purposes of testing and dynamic analysis. The SCARPE tool mentioned by Orso and Kennedy (2005)  is described at length in the later paper by Joshi and Orso (2007). The technique described involves defining groups of classes and monitoring method calls that cross the boundary of the defined group, with a view to reproducing these calls for replay, thereby potentially sidestepping much of the gritty specifics addressed by Steven et al. (2000) in their interaction with native methods and substitutions into the Java standard library to produce jRapture. This advantage is achieved by the use of the BCLE (Bytecode Engineering Library), thereby emphasising the potential to use bytecode implementation to simplify the difficult tasks that the authors of earlier papers encountered.
+
+For completeness, it is worth mentioning Alpern, Ngo, Choi and Sridharan (2000) for their contribution of the DejaVu tool. This paper and associated tool also targets deterministic replay of multithreaded applications, and therefore falls amongst a number of other papers working toward the same objective.
+
+While there are many papers in the field, including those mentioned, that attempt to multithreaded application execution in Java deterministic, only those that have something to say about simulating input and output are of relevance to this project, others that do not address simulating IO are excluded from this review.
+
+%% System Description %%
+\chapter{\label{system_description} System Description}
+
+%%%% Section for each artefact, focused on prior work, then my work %%
+\section{Application Replay}
+
+In the section Related Work a great deal of reference was made to Bytecode Replay as a technique to cause the JVM to execute the same bytecode repeatedly. Both Steven et al. and Orso and Kennedy focused on making the execution path, and thus the bytecode, the same for multiple runs of an application with a view to dynamic analysis and testing. For the purposes of this project similar techniques are applied and expanded upon, but the term bytecode replay is not favoured. Instead the term “Application replay” is used to emphasise that the overall application is being replayed in terms of its function, and the manner in which it converts its inputs into outputs, but now specifically the bytecode that it executes. Rather, it is important that consecutive runs of the application be allowed freedom to vary at the bytecode level in response to differing JVM parameters so that differences in performance will result.
+
+Notwithstanding the differing intent of this project, the techniques used to effect application replay draw on related works that refer to bytecode replay but herein there is an acknowledgement that an exact reproduction of the bytecode is in fact undesirable, not a target for which to strive.
+
+The Mimic artifact provided is capable of loading an arbitrary Java application and recording the input and output of methods that are nominated in a configuration file provided. Subsequently the same application can be re-run and the recorded data is replayed through the application, complete with execution delays that result from calling the nominated method. Where that method communicates with an upstream system this successfully severs the dependance that the application under scrutiny has on the upstream, and, provided the correct selection of methods are nominated to sever all such connections then the replay is independent of the upstream system and can be conducted without connection to that upstream system.
+
+In order to record and replay method invocations a technique of bytecode manipulation is used. The Mimic artifact relies heavily on the ASM Bytecode Engineering library and uses it to effect manipulation in the bytecode of the methods nominated for record/replay at the time that the containing class is loaded by the JVM.
+
+Since the Java Virtual Machine version 1.5, the Java standard library has included the java.lang.instrument package which contains tools to allow a Java Agent specified in the invocation of the JVM to instrument classes as they are loaded. Though it provides no facility to actually manipulate the bytecode, it allows a special class, called an Agent, to run a method called premain and provides the bytecode being loaded so that it can be transformed therein with a third-party tool. In this fashion tools that exist to manipulate bytecode contained in classes residing in storage can now be inserted into the class loading activity, providing the facility to store the classes unmodified and modify them during the startup of the JVM just before the application’s main method is called. In essence this provides the facility to perform load-time manipulation instead of compile-time manipulation but without any loss of flexibility or power in the manipulation.
+
+This bytecode manipulation, whether performed at compile time or load time, is powerful, and can create new classes, methods, fields, and insert bytecode into the content of methods. The actual bytecode modifications are typically carried out using bytecode manipulation tools such as BCEL and ASM which expose bytecode to the programmer for direct manipulation or Javaassist and CGLib which provide a higher level Java API to perform the same modifications without the need to understand bytecode.
+
+In pursuit of this project the Javassist and ASM libraries were considered in depth. Both libraries provide the ability to effect structural modifications to class files while they are being loaded into the JVM. Such modifications go beyond the capabilities of the Java Reflection API provided in the java.lang.reflect package, allowing introduction of new classes, methods, local variables into existing code, and modification of the code inside methods. The primary difference between Javassist and ASM is in the API provided by each. Javassist provides an API consisting of java method invocations that treat meta-objects in the JVM as objects to be manipulated with relatively easy and legible methods to manipulate the underlying classes. [Chiba, Shigeru. "Load-time structural reflection in Java." ECOOP 2000—Object-Oriented Programming. Springer Berlin Heidelberg, 2000. 313-336.]
+
+Examples of such methods are:
+
+\begin{description}[style=nextline]
+\item[CtClass.bePublic()] which changes visibility of a class to be public;
+\item[CtClass.addField()] which adds a field to a class;
+\item[CtClass.addMethod()] which adds a new method to a class.
+\end{description}
+
+ASM on the other hand takes a somewhat different and more complex approach and requires an understanding of Java bytecode. Classes are presented for modification in a visitor pattern and desired modifications are effected by overriding methods in the provided visitor pattern to change the bytecode they return. Thus, to change the content of a method it is necessary to override the visiting method and change the returned bytecode, which is by default unmodified, to the modified version.
+
+Perhaps a better description is provided by Kuleshov [Kuleshov, Eugene. "Using the ASM framework to implement common Java bytecode transformation patterns." Aspect-Oriented Software Development (2007).]                           
+    
+“The main idea of the ASM API is not to use an object representation of the bytecode. This made it possible expressing the same transformations using only a few classes comparing to approximately 80 classes in Serp and 270 in BCEL API. Those frameworks create lots of objects during class deserialization, which takes a lot of time and memory. ASM avoids this overhead to keep transformation fast and to use very little memory. This is done by using the Visitor design pattern, without representing the visited tree with objects.”
+
+For comparison with Javassist, below is an abridged example of ASM usage taken from the Mimic artifact of this project:
+
+\begin{verbatim}
+@Override
+protected void onMethodExit(final int opcode) {
+
+...
+
+    /*
+     * for single sized primitives, duplicate and box them, leaving a
+     * reference behind for the accounting method
+     */
+    super.dup();
+    super.box(Type.getReturnType(this.methodDesc));
+    break;
+
+    /* add the type of the return */
+
+    super.visitIntInsn(Opcodes.SIPUSH, opcode);
+
+    super.visitMethodInsn(
+        Opcodes.INVOKESTATIC, "org/overworld/mimic/Record", "exit",
+        "(Ljava/lang/Object;I)V",
+        false);
+}
+\end{verbatim}
+
+The key point to notice from this example is that the API consists of methods that mirror bytecode instructions, in this case dup and box, which perform duplication of the top of stack, and Java autoboxing respectively. These are not concepts that a Java programmer would routinely interact with at the bytecode level. With ASM the programmer is no longer insulated from the details of bytecode and the stack machine nature of the JVM. Additionally, the INVOKESTATIC bytecode instruction is invoked using ASM in this example, demonstrating the insertion of a method invocation into the bytecode, the invocation of which requires use of the JVM internal representation for method names and types in the method signature (“(Ljava/lang/Object;I)V” is the JVM internal representation of the signature of a method that takes an Object reference and a primitive int and has return type void.)
+
+While Javassist was trialled in this project, the implementation was abandoned at an early stage in favour or ASM for two reasons:
+
+It was decided that ASM would provide greater power and flexibility in manipulating the bytecode of existing methods, whereas Javassist would excel at the creation of new methods and classes. As the former is a significant requirement of the Mimic agent and the latter is not, ASM was preferred. It may be noted that when a requirement arose to introduce a new local variable into the method body of instrumented methods, this required significant effort in ASM.
+ASM interacts with the Instrumentation object provided as a parameter to the premain method of the agent by direct attachment of a ClassFileTransformer, whereas Javassist requires transforming the class after it has loaded by finding it in the Javassist class pool, which, while quite feasible, is inelegant and does not fit as well into the paradigm of instrumentation using a java agent at class load time.
+
+\subsection{Challenges to Instrumentation with ASM}
+\subsubsection{Virtual Machine Errors}
+
+A concept familiar to Java programmers is the Java Stack Trace. As in other languages, a stack trace is produced automatically when an exception is generated within the JVM. It is also possible to generate a stack trace programmatically in normal code without raising an exception. A stack trace can be produced anywhere in executing code by use of Thread.getStackTrace(). There is nothing inherently erroneous about a stack trace, rather it is a feature used when an exception is raised to automatically pinpoint the site at which the execution occurred, and list all method calls that lead up to that exception starting at the first frame of the current thread.
+
+The Java stack trace generated in a JVM on raising an exception is a distinctly Java concept, internal to and generated by the JVM. A functioning JVM is required to correctly propagate the exception backward through the stack, calling all relevant catch clauses in an effort to handle the exception. While the JVM is executing this exception-handling sequence the Java program itself is in a state of error and the exception may be handled, such that the program can return to executing non-error-handling code again, or the exception may propagate unhanded to the top of the stack for the current thread and, subject to any default exception handlers installed on the thread may terminate that thread.
+
+Even when an uncaught exception causes the termination of the current Java thread, while this may be a bad thing from the perspective of the Java program running, it must be remembered that the JVM underlying the program execution is functioning correctly. It is the function of the JVM to perform this exception handling.
+
+The JVM is, however, capable of generating errors just like any C program, it may generate a SIGSEGV if it attempts to dereference an area of memory it shouldn’t, being then terminated by the operating system, or it can terminate with a fatal error internal to the JVM. It is important to understand the difference between exception handling in a Java program which indicates a correctly functioning JVM, and errors in the JVM itself which result in a fatal error of the JVM. The latter case indicates incorrect functioning of the JVM. Conventional wisdom is that nothing that a Java program ever executes should be capable of terminating the JVM. Therefore if your Java program causes a JVM error, you are quite entitled to log that as a bug with the JVM vendor. The Java code has immunity from blame in the case of JVM errors as Java programs should not be able to knock over the JVM.
+
+However, since Java 1.5 and the advent of the Instrumentation package, it is possible to programmatically rewrite the bytecode of classes in the JVM, and it is quite possible to make modifications to the bytecode that will, in fact, cause the JVM to terminate. Examination of the stack trace of the JVM produced in the error log (Which is distinct from the Java stack trace, which exists in a correctly functioning JVM) often shows the JVM is executing virtual machine code at the time of the error, indicated by a ‘V’, rather than Java code as would be indicated by a ‘J’.
+
+If the error is caused by instrumentation then there is little benefit in treating the failure as a bug in the JVM as current JVMs are not immune from errors caused by code directly inserted into a class by instrumentation, you rather have to track down the error in the inserted or modified bytecode. However you are now deprived of the relative comfort and clarity of tidy Java stack traces, and are viewing stack traces of the object code that was compiled from C by the C compiler that produced your JVM, this can be of dubious utility in determining where in the Java code you caused the change to the bytecode that resulted in the JVM error.
+
+To make matters more interesting still, even if the instrumentation you inserted used INVOKESTATIC, INVOKESPECIAL, INVOKEDYNAMIC or INVOKEVIRTUAL to enter back into java code by calling a Java method within your instrumented bytecode, you may still have to attach a debugger to the program to see the Java stack trace as the failing JVM may not produce it for your perusal. Even where you attach a debugger and manage to break execution on the relevant exception, the inconsistent state of the JVM can produce bafflingly counterintuitive results that would be impossible to achieve in correctly compiled, uninstrumented Java.
+
+The problems described in the remainder of this section result from instrumented bytecode and suffer from at least some of the difficulties mentioned here.
+
+\subsubsection{Circular Methods Calls Resulting from Instrumentation}
+
+Where a method is instrumented to call an accounting method, and that method results in a call back to an instrumented method a conceptual circularity results. Take for example the task of instrumenting all public, non-native methods of java.lang.Thread including Thread.getName(). No methods of Thread are actually called during the instrumentation step and the methods of the class will be instrumented just fine. In this case the methods are being instrumented to send their parameters (On entry) and return value (On exit) to accounting methods in the class org.overworld.mimic.Register, called enter(…) and exit(…) respectively.
+
+However, if the Register.enter(…) method inadvertently calls back to a method of Thread then a circularity exists. While this might not be done overtly, the Register.enter(…) method might use a method such as Arrays.deepToString(…) on the parameters it received from the instrumentation in the Thread.getName() method. 
+
+If one were to look in the resulting error file, the object code stack of the JVM is listed as:
+
+\begin{verbatim}
+Stack: [0x000000010711d000,0x000000010721d000],  sp=0x000000010721c710,  free space=1021k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.dylib+0x579644]
+V  [libjvm.dylib+0x1daceb]
+V  [libjvm.dylib+0x2336bd]
+V  [libjvm.dylib+0x1ad150]
+V  [libjvm.dylib+0x1ad239]
+V  [libjvm.dylib+0x538ce5]
+V  [libjvm.dylib+0x308d15]
+C  [java+0x241e]  JavaMain+0x134
+C  [libsystem_pthread.dylib+0x405a]  _pthread_body+0x83
+C  [libsystem_pthread.dylib+0x3fd7]  _pthread_body+0x0
+C  [libsystem_pthread.dylib+0x13ed]  thread_start+0xd
+C  0x0000000000000000
+\end{verbatim}
+
+Note that ‘C’ indicates native code, and ‘V’ indicates VM code, but there are no frames identified as ‘J’ for Java late in the stack.
+
+And while the JVM indicates that a NullPointerException has occurred, it does not provide a Java stack trace in this instance. This NullPointerException is of little utility because no NullPointerException or the cause thereof can be found in the Java code when it is reproduced in the Eclipse Luna debugger, it is rather an artefact of the failure but not in fact generated by any compiled Java code. The output is limited to:
+
+\begin{verbatim}
+Class name: java/lang/Thread, class signature: , method name: toString, method signature: ()Ljava/lang/String;, number of arguments: []
+Class name: java/lang/Thread, class signature: , method name: getThreadGroup, method signature: ()Ljava/lang/ThreadGroup;, number of arguments: []
+Class name: java/lang/Thread, class signature: , method name: getThreadGroup, method signature: ()Ljava/lang/ThreadGroup;, return category : ARETURN, return value: null
+Class name: java/lang/Thread, class signature: , method name: getName, method signature: ()Ljava/lang/String;, number of arguments: []
+java.lang.NullPointerException
+ - klass: 'java/lang/NullPointerException'
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  Internal Error (exceptions.cpp:419), pid=15098, tid=4867
+#  fatal error: ExceptionMark destructor expects no pending exceptions
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_25-b17) (build 1.8.0_25-b17)
+# Java VM: Java HotSpot(TM) 64-Bit Server VM (25.25-b02 mixed mode bsd-amd64 compressed oops)
+# Failed to write core dump. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# An error report file with more information is saved as:
+# /Users/stephen/cwork/mimic/hs_err_pid15098.log
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.sun.com/bugreport/crash.jsp
+#
+Abort trap: 6
+\end{verbatim}
+
+Reproducing the error in the Eclipse Luna debugger produces this stack trace at the point that the JVM reports the NullPointerException. (We discussed earlier that a stack trace can be produced even when no exception of Java origin is being handled.)
+
+\begin{verbatim}
+Thread [main] (Suspended (exception NullPointerException))    
+    String.length() line: 611    
+    StringBuilder(AbstractStringBuilder).append(String) line: 420    
+    StringBuilder.append(String) line: 136    
+    StringBuilder.append(String) line: 76    
+    StringBuilder(AbstractStringBuilder).append(CharSequence) line: 457    
+    StringBuilder.append(CharSequence) line: 166    
+    StringBuilder.append(CharSequence) line: 76    
+    Formatter$FormatSpecifier.print(String) line: 2913    
+    Formatter$FormatSpecifier.printString(Object, Locale) line: 2886    
+    Formatter$FormatSpecifier.print(Object, Locale) line: 2763    
+    Formatter.format(Locale, String, Object...) line: 2520    
+    Formatter.format(String, Object...) line: 2455    
+    String.format(String, Object...) line: 2927    
+    Register.exit(Object, String, String, String, String, int) line: 26    
+    Thread.getName() line: 1135    
+    Thread.toString() line: 1399    
+    Arrays.deepToString(Object[], StringBuilder, Set<Object[]>) line: 4669    
+    Arrays.deepToString(Object[]) line: 4619    
+    Register.enter(String, String, String, String, Object[]) line: 17    
+    Thread.<init>(ThreadGroup, String) line: 531    
+\end{verbatim}
+
+Reading the stack trace from the bottom up indicates that the Thread constructor (Thread.<init>) results in a call to the Register.enter(…) accounting method, which uses Arrays.deepToString(…) setting off a sequence of calls that results in entry to Register.exit(…) before Register.enter(…) has returned. Even though the stack trace indicates a NullPointerException in String.length(), thorough inspection of all variables in the debugger shows no possible cause for a NullPointerException, suggesting that the circularity has caused a corruption resulting in the JVM error later in program execution, rather than a true NullPointerException generated by compiled Java code. Removal of the call to Arrays.deepToString(…) eliminates the error and the program operates and terminates normally.
+
+This suggests that instrumentation, particularly of core classes, should be performed abstemiously to reduce  the likelihood of circularity. Additionally, care should be taken to reduce method calls in the accounting methods that might call back into the instrumented method.
+
+Unfortunately though, the accounting methods will have a significant amount of work to do, making it difficult to simplify them. It may thus be necessary to perform complex accounting operations in a separate thread, thereby liberating them from the call stack that includes instrumentation-driven method invocations. Delegating the complicated aspects of accounting logic to another thread means that errors generated by that thread will be handled normally without the potential to cause JVM errors, as the call stack of the computation thread will be free of all instrumentation so Java exception handling will operate normally and no stack traces will be hidden by JVM errors. To achieve this scheme, the Register.enter(…) and Register.exit(…) accounting methods must be decoupled from the thread performing accounting computations by an asynchronous messaging mechanism that disentangles the call stack of the two threads.
+
+\subsubsection{Incorrect Reference Handling in Bytecode}
+
+The following code indicates the correct procedure for storing a parameter to the method, in this case a primitive long value, into an array of type Object[] using a local reference to the array. In this case the array has been dynamically constructed in bytecode and a new local variable has been constructed, again in bytecode, to store the reference to the array. The new local variable has no name, but an integer that represents its location to the ASM library is stored in local_array.
+
+The source code, consisting of calls to the MethodVisitor class of the ASM library, is commented to describe the flow of the newly constructed bytecode, however the last two lines are those of particular interest.
+
+The MethodVisitor.box(…) method performs a boxing of the parameter that was passed into the method. This boxing constructs a new Long instance that wraps the long parameter, thereby turning it from a primitive type into an Object. This is necessary because AASTORE will store it in an array of type Object[], therefore it must find a reference to an Object on the operand stack, not the original primitive long.
+
+\begin{verbatim}
+/* load a reference to an array of type Object[] from a local variable local_array onto the operand stack,
+ * note that local_array is an int representing a local variable dynamically constructed by instrumentation
+ */
+this.mv.visitVarInsn(Opcodes.ALOAD, local_array);
+
+ /* push an int index onto the stack, representing the index in the target array,
+ * note that index is a normal Java local variable in the source code
+ */
+ this.mv.visitIntInsn(Opcodes.BIPUSH, index);
+
+/* load a long value from the parameters array at position offset */
+this.mv.visitVarInsn(Opcodes.LLOAD, offset);
+
+/* box the long value on the top of the stack, replacing it with the reference to the new Long instance */
+this.box(type);
+
+/* store the result into the array consuming from the stack: target array reference, index, value to store */
+ this.mv.visitInsn(Opcodes.AASTORE);
+\end{verbatim}
+
+If the line box(type) were omitted then the AASTORE instruction would not find a reference to the target array third from the top of the stack because a primitive long takes up two frames of the operand stack (Being a 64 bit type), instead of the one that is expected for the data reference, thereby pushing the stack down a frame, resulting in error.
+
+Correct behaviour, when the primitive long is boxed to Long, leaving a reference on top of stack:
+
+reference to Long <- AASTORE expects data reference here
+target index <- AASTORE expects array index here
+array reference <- AASTORE expects array reference here
+
+Incorrect behaviour, when the primitive long remains on the stack unboxed because the line MethodVisitor.box(type) was omitted. Notice that the AASTORE expects to find a reference to the target array third from the top of the stack, but the index is there instead:
+
+primitive long part 1 <- AASTORE expects data reference here
+primitive long part 2 <- AASTORE expects array index here
+target index <- AASTORE expects aray reference here
+array reference
+
+Because index is a low number, intended to represent the target index in the target array, a SIGSEGV from the operating system is virtually guaranteed when this low value is dereferenced. A Java stack trace will not result, only a JVM error.
+
+\subsubsection{Instrumented Method Invocations to Classes in Lower ClassLoaders}
+
+In Java a Class Loader is responsible for finding the bytecode of a Java class by name and loading it into the JVM for use. Often this bytecode is read from disk, but it can be taken over the network, or a subclass of java.lang.ClassLoader can be provided that obtains the bytecode by any means the programmer cares to implement. A running Java program, however, has multiple class loaders, and one of them is always the Bootstrap (Or Primordial) class loader, which is a part of the JVM and is not implemented in the Java libraries at all. This bootstrap class loader is implemented in C in the JVM as it loads the first Java class into the JVM, along with all classes from the Java Runtime JAR rt.jar, and in turn the Java implementation of java.lang.ClassLoader which serves as the superclass for all subsequent class loaders. Thereafter it remains in the JVM to manage those classes loaded from rt.jar. Application classes provided in a JAR or on the classpath are loaded in child class loaders, which are implemented in Java as subclasses java.lang.ClassLoader.
+
+When one Java class references another class, such as when it tries to create an instance of it, or call a method within it, the referenced class must be in the same or a higher class loader than that which loaded the referencing class. Classes cannot reference other classes in class loaders that are siblings or children of theirs.
+
+Ordinarily this mechanism works just fine as classes are loaded in the highest class loader that has access to the definition of the class. Only in applications that change the behaviour of class loaders in an effort to have multiple versions of a class is this a problem. This can occur where a very common library, such as, for example, log4j is loaded multiple times in an application but under different class loaders. Application Servers often encapsulate purely application code in a lower class loader than that used by the  classes comprising the Application Server itself, thus allowing multiple versions of common libraries, and separating the namespaces of the application server and code subsequently loaded into it.
+
+A complication arises when instrumenting a class that has been loaded from rt.jar, (Such as anything in the java.lang package) as those classes are always loaded by the bootstrap class loader, and therefore cannot reference classes in any lower class loader. This is a problem if you wish to instrument such a class to call a method which you have provided with your agent or application code, as those are loaded by class loaders other than, and lower than the bootstrap class loader, and so a NoClassDefFoundError will result at runtime.
+
+In the context of the Mimic application, it is essential to instrument java.lang.Thread to be notified when a new thread is constructed in the JVM. This is achieved by intercepting the method entry and exit on Thread.run() in the same fashion as all other method interceptions. The inserted bytecode calls an accounting method, in this case org.overworld.mimic.Register.enter(…) to notify the gathered parameters and, indirectly, the thread id (Because enter(…) runs in the target thread, being invoked from Thread.run().)
+
+However this arrangement is only possible if the Register class is available to the Thread class and that is not routinely so because Thread is in the bootstrap class loader as previously described. It is infeasible to move Thread to a different class loader as classes cannot be unloaded, and it is required in the bootstrap class loader for the use of other classes also contained therein. Thus the obvious solution is to move the Register class into the bootstrap class loader to cohabit with Thread and all core classes from rt.jar. This works well because the Register class then becomes available to all class loaders, because it is now in the topmost class loaders.
+
+To achieve this fix, the JAR file that contains the Register class is loaded directly into the bootstrap class loader in the invocation of the JVM by using the command line option -Xbootclasspath/a:/path/to/my.jar, where the named JAR contains the Register class, either separated into its own JAR, or indeed by loading the JAR containing the entire Java Agent and Mimic application, complete with Register class. The second option introduces the Mimic Agent and related classes unnecessarily to the bootstrap class loader, but this is not a difficulty as they will simply be visible to every class loader in the JVM, and thus will not be re-loaded by any other class loader. Thus when bytecode in java.lang.Thread is instrumented to include an INVOKESTATIC, INVOKESPECIAL, INVOKEVIRTUAL, or INVOKEDYNAMIC bytecode instruction that references the Register class, it will succeed at runtime as the class Register is now visible to the class Thread.
+
+\section{Performance Measurement}
+
+As previously described, this project requires multiple runs of the application under scrutiny, each with differing JVM parameters, with a performance measurement on each run, the object being to collect enough data to achieve two goals:
+Determine programmatically which collection of JVM parameters is preferable;
+Describe to the user graphically why a particular set of parameters is preferable.
+
+This requires a selection of performance metrics spanning CPU, Memory, Garbage Collection, and also a measure of whether the invocation was successful.
+A number of technologies were considered for collection of performance metrics. 
+
+The Sun HotSpot JVM includes a feature called ‘Flight Recorder’. When activated the JVM produces a textual record of metrics from the JVM for the duration of its execution.
+
+“Java Flight Recorder and Java Mission Control together create a complete tool chain to continuously collect low level and detailed runtime information enabling after-the-fact incident analysis. Java Flight Recorder is a profiling and event collection framework built into the Oracle JDK. It allows Java administrators and developers to gather detailed low level information about how the Java Virtual Machine (JVM) and the Java application are behaving.”
+[http://www.oracle.com/technetwork/java/javaseproducts/mission-control/java-mission-control-1998576.html]
+
+A graphical application named “Oracle Java Mission Control” can be used to configure the data collection performed by Flight Recorder, producing a settings file which can be passed on the command line to the JVM on invocation.
+
+Unfortunately there are reasons why Flight Recorder is unsuitable for this project:
+Flight Recorder is a feature of “Java SE Advanced” or “Java SE Suite” which are not freely available, requiring instead a paid licence from Sun. [http://www.oracle.com/technetwork/java/javaseproducts/overview/java-advanced-getstarted-2249239.html];
+Flight Recorder can be configured with a settings file specified as a command line argument to the JVM, and the settings file can be created in Oracle Java “Mission Control” as described, however the resulting settings file must be placed in a specific directory under the installed JVM in which the application under scrutiny is running, it cannot be provided programmatically by the Metre artifact;
+The output of the Flight Recorder is in the form of a log file. While this file could be parsed after the execution of the JVM, a scheme of real-time measurement that can be achieved transparently and programmatically would be preferable.
+
+The Oracle HotSpot JVM has a number of options to print statistics about the running JVM, for example -XX:+PrintGC, -XX:+PrintGCApplicationConcurrentTime  -XX:+PrintGCApplicationStoppedTime and similar options print data about garbage collection. -XX:+PrintTenuringDistribution prints information about the occupancy of the various generations in the JVM memory model. For CPU utilisation, a Hprof agent can be loaded in the JVM at invocation to monitor CPU statistics at defined intervals.
+
+Unfortunately though, this approach is rather scattered, requiring a selection of JVM parameters, and the use of the hprof agent in a JVM that already has the Mimic agent loaded. This approach would leave the desired data in both files and the standard output of the execution, and significant parsing would be required to divine the desired metrics.
+
+Ideally a selection of metrics would be available in a programmatically accessible form without the need to parse output files. A tool that provides this function is “JConsole” which is provided with the JVM. JConsole connects to a running JVM and displays a wide selection of metrics including CPU, heap and memory generations, threads, loaded classes and garbage collection, in short every metric one could conceivably need to determine the performance of a JVM invocation.
+
+
+The JConsole application gathers this information from the running JVM using MBeans that are read from the remote JVM by connecting to its MBean Server, which is built into the JVM. Only some simple configuration is required to allow connection to the MBean server of a JVM, and it can be performed programmatically on the command line at invocation. A large selection of metrics are thus accessible and JConsole then reads them at intervals.
+
+This project uses the same scheme whereby it connects to the MBean server of the JVM under scrutiny and collects desired metrics at intervals. These metrics can then be used to programmatically calculate an overall performance score for the run of the application, and can also be used to produce graphs for the perusal of the user, showing the relative performance of different JVM parameter selections.
+
+This functionality is implemented in the Metre artifact included in this project.
+
+\subsection{Challenges to Measurement}
+\subsubsection{The Attach API}
+
+In order to connect to a remote JVM class com.sun.tools.attach.VirtualMachine from the Attach API required along with supporting exceptions including AgentInitializationException, AgentLoadException, AttachNotSupportedException. In order to use these classes it is necessary to include tools.jar in the classpath. The tools.jar is provided with the installation of the Oracle HotSpot JVM version 1.8.
+
+Ordinarily dependencies are introduced into the artifacts in the project by adding them to the pom.xml of the Maven build system. However tools.jar is a system dependency in that it is provided with the JVM, and the copy of tools.jar that is provided with the JVM is the correct one to use for applications executed with that JVM so it is not desirable to introduce tools.jar anywhere in the project or carry it around with the project. Instead the tools.jar must be referenced from its location in the JVM installation root both for the purposes of development and compilation with Maven and also at runtime when the compiled application executes.
+
+To include a system dependency with Maven is relatively simple, requiring this addition to the pom.xml:
+
+\begin{verbatim}
+<dependency>
+<groupId>jdk.tools</groupId>
+<artifactId>jdk.tools</artifactId>
+<version>jdk1.8.0</version>
+<scope>system</scope>
+<systemPath> ${java.home}/../lib/tools.jar </systemPath>
+</dependency>
+\end{verbatim}
+
+Thereby referencing the system dependency relative to the Maven java.home location.
+
+However, this will not make tools.jar available at runtime. In order to do so it must be added to the runtime classpath. The artifacts in this project all run from jar files as they are packaged into jars neatly by Maven. When a jar file is executed using java -jar … on the command line the classpath is defined by the jar file and cannot be extended by the addition of a command line option as it could be when executing a class directly.
+
+For this reason the Metre artifact has one prerequisite activity which, while not ideal, is the neatest of the available options, specifically that the tools.jar file should be moved, copied or linked into the jre/lib/ext directory, thereby installing it as an extension jar for all invocations of the JRE that owns the corresponding jre/lib/ext directory. [https://docs.oracle.com/javase/tutorial/ext/basics/install.html ] 
+
+Once this preparatory step is taken, invocation of the Metre artifact, as later described, but with the useful addition of the -verbose flag will indicate that the relevant classes are loaded from the tools.jar in its new location:
+
+\begin{verbatim}
+[Loaded com.sun.tools.attach.AttachNotSupportedException from file:/Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home/jre/lib/ext/tools.jar]
+\end{verbatim}
+
+%% Experimental Design %%
+\chapter{\label{experimental_design} Experimental Design}
+\section{Synonym Service}
+
+%% Results and Analysis %%
+\chapter{\label{results_and_analysis} Results and Analysis}
+
+%% Conclusion %%
+\chapter{\label{conclusions} Conclusions}
+
+%% References %%
+\newpage
+\bibliographystyle{plain}
+\bibliography{report}
+
+\end{document}

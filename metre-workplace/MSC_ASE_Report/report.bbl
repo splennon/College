@@ -1,0 +1,77 @@
+\begin{thebibliography}{10}
+
+\bibitem{leblanc:1987}
+T.~J. LeBlanc and J.~M. Mellor-Crummey, ``Debugging parallel programs with
+  instant replay,'' {\em Computers, IEEE Transactions on}, vol.~100, no.~4,
+  pp.~471--482, 1987.
+
+\bibitem{pallis:2010}
+G.~Pallis, ``Cloud computing: the new frontier of internet computing,'' {\em
+  IEEE Internet Computing}, vol.~14, no.~5, p.~70, 2010.
+
+\bibitem{papazoglou:2008}
+M.~Papazoglou, {\em Web services: principles and technology}.
+\newblock Pearson Education, 2008.
+
+\bibitem{jenkins:2011}
+J.~Jenkins, ``Velocity culture,'' in {\em O'Reilly Velocity Conference.
+  http://blip.
+  tv/oreilly-velocity-conference/velocity-2011-jon-jenkins-velocity-culture-5297293,
+  letzter Zugriff}, vol.~23, p.~2012, 2011.
+
+\bibitem{el:2005}
+H.~El-Rewini and M.~Abd-El-Barr, {\em Advanced computer architecture and
+  parallel processing}, vol.~42.
+\newblock John Wiley \& Sons, 2005.
+
+\bibitem{steven:2000}
+J.~Steven, P.~Chandra, B.~Fleck, and A.~Podgurski, {\em jRapture: A
+  capture/replay tool for observation-based testing}, vol.~25.
+\newblock ACM, 2000.
+
+\bibitem{joshi:2007}
+S.~Joshi and A.~Orso, ``Scarpe: A technique and tool for selective capture and
+  replay of program executions,'' in {\em Software Maintenance, 2007. ICSM
+  2007. IEEE International Conference on}, pp.~234--243, IEEE, 2007.
+
+\bibitem{daum:2005}
+M.~Daum and S.~Lucks, ``Hash collisions (the poisoned message attack) ``the
+  story of alice and her boss'','' {\em rump session of Eurocrypt}, vol.~5,
+  pp.~253--271, 2005.
+
+\bibitem{java:2016}
+``Java platform, standard edition tools reference, java.''
+  \url{http://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html}.
+\newblock Accessed: 2016-03-10.
+
+\bibitem{choi:1998}
+J.-D. Choi and H.~Srinivasan, ``Deterministic replay of java multithreaded
+  applications,'' in {\em Proceedings of the SIGMETRICS symposium on Parallel
+  and distributed tools}, pp.~48--59, ACM, 1998.
+
+\bibitem{chiba:2000}
+S.~Chiba, ``Load-time structural reflection in java,'' in {\em ECOOP
+  2000—Object-Oriented Programming}, pp.~313--336, Springer, 2000.
+
+\bibitem{kuleshov:2007}
+E.~Kuleshov, ``Using the asm framework to implement common java bytecode
+  transformation patterns,'' {\em Aspect-Oriented Software Development}, 2007.
+
+\bibitem{georges:2002}
+A.~Georges, M.~Christiaens, M.~Ronsse, and K.~De~Bosschere, ``Jarec: a
+  record/replay system for multi-threaded java applications.,'' {\em Parallel
+  Computing: Grids and Applications/Joubert, G.; Weberpals, H.; Ronsse, M.;
+  D'Hollander, E.(eds.).-Ghent: Communication \& Cognition, 2002.},
+  pp.~125--146, 2002.
+
+\bibitem{schuppan:2005}
+V.~Schuppan, M.~Baur, and A.~Biere, ``Jvm independent replay in java,'' {\em
+  Electronic Notes in Theoretical Computer Science}, vol.~113, pp.~85--104,
+  2005.
+
+\bibitem{extensions:2016}
+``The java tutorials, installed extensions.''
+  \url{https://docs.oracle.com/javase/tutorial/ext/basics/install.html}.
+\newblock Accessed: 2016-03-16.
+
+\end{thebibliography}
