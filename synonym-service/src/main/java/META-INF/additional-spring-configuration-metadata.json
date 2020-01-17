@@ -1,0 +1,22 @@
+{"properties": [
+  {
+    "name": "upstream.synonym.url",
+    "type": "java.lang.String",
+    "description": "The URL of the upstream Synonym Service"
+  },
+  {
+    "name": "engine.stopwords",
+    "type": "java.lang.String",
+    "description": "A list of stopwords"
+  },
+  {
+    "name": "service.threadCount",
+    "type": "java.lang.String",
+    "description": "The number of threads in the Executor Serivce thread pool"
+  },
+  {
+    "name": "upstream.maxExceptionWindow",
+    "type": "java.lang.Integer",
+    "description": "The duration in ms within which two upstream 500 errors aborts the task"
+  }
+]}
